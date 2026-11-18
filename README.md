@@ -1,5 +1,7 @@
 # gradient
 
+[![CI](https://github.com/MechStudents2029/gradient/actions/workflows/ci.yml/badge.svg)](https://github.com/MechStudents2029/gradient/actions/workflows/ci.yml)
+
 A from-scratch reverse-mode automatic differentiation engine in TypeScript.
 
 The plan: a tiny scalar autodiff core, then a web UI that draws the computation
