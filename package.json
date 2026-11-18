@@ -1,0 +1,25 @@
+{
+  "name": "gradient",
+  "version": "0.1.0",
+  "description": "A from-scratch reverse-mode automatic differentiation engine in TypeScript.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Adam Rouzaqui",
+  "repository": "github:MechStudents2029/gradient",
+  "keywords": [
+    "autodiff",
+    "backpropagation",
+    "calculus",
+    "machine-learning",
+    "typescript"
+  ],
+  "scripts": {
+    "test": "vitest run --passWithNoTests",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.1"
+  }
+}
