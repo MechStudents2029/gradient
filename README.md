@@ -57,3 +57,14 @@ contribution from every path to the output.
 | `ln x` | 1/x |
 | `tanh x` | 1 − tanh² x |
 | `relu x` | 1 if x > 0 else 0 |
+
+## Gradient checking
+
+Every op is tested against the central finite difference
+
+```
+f'(x) ≈ (f(x + h) − f(x − h)) / 2h      (error O(h²))
+```
+
+via `numericGrad` in `src/gradcheck.ts`, including a deep mixed expression of
+`tanh`, `exp`, powers, and division.
