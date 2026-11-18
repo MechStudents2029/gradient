@@ -34,3 +34,26 @@ npm test
 - [ ] Day 3: computation-graph visualizer (web UI)
 - [ ] Day 4: step-by-step derivative walkthrough + Taylor series
 - [ ] Day 5: live training demo, deployed on Vercel
+
+## The math
+
+Each `Value` stores its number, its parents, and a local derivative rule.
+`backward()` sorts the graph topologically, seeds `dL/dL = 1`, and walks it in
+reverse, applying the chain rule at every edge:
+
+```
+dL/dparent += dL/dchild · dchild/dparent
+```
+
+Gradients use `+=` because a node used twice (like `x` in `x·x + x`) receives a
+contribution from every path to the output.
+
+| op | local derivative |
+| --- | --- |
+| `a + b` | 1, 1 |
+| `a · b` | b, a |
+| `xᵏ` | k·xᵏ⁻¹ |
+| `eˣ` | eˣ |
+| `ln x` | 1/x |
+| `tanh x` | 1 − tanh² x |
+| `relu x` | 1 if x > 0 else 0 |
