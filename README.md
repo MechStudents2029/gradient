@@ -22,6 +22,21 @@ y.backward();
 console.log(y.data, x.grad, w.grad); // dy/dx = w(1 - y²), dy/dw = x(1 - y²)
 ```
 
+Train a 2-4-1 network on XOR:
+
+```ts
+import { MLP, mse, sgdStep } from "./src/index.js";
+
+const xs = [[0, 0], [0, 1], [1, 0], [1, 1]];
+const ys = [0, 1, 1, 0];
+const net = new MLP([2, 4, 1], { hidden: "tanh", output: "sigmoid", seed: 1 });
+for (let step = 0; step < 2000; step++) {
+  const loss = mse(xs.map((x) => net.forward(x)[0]!), ys);
+  loss.backward();
+  sgdStep(net.parameters(), 1.0);
+}
+```
+
 ```sh
 npm install
 npm test
@@ -30,7 +45,7 @@ npm test
 ## Roadmap
 
 - [x] Day 1: scalar `Value` with reverse-mode `backward()` and gradient checks
-- [ ] Day 2: more ops and a tiny MLP
+- [x] Day 2: `sigmoid`, a tiny MLP, and SGD that learns XOR
 - [ ] Day 3: computation-graph visualizer (web UI)
 - [ ] Day 4: step-by-step derivative walkthrough + Taylor series
 - [ ] Day 5: live training demo, deployed on Vercel
