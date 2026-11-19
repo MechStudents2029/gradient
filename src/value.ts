@@ -7,7 +7,7 @@
  *
  *     dL/dparent += dL/dchild * dchild/dparent
  */
-export type Op = "" | "+" | "*" | "pow" | "exp" | "log" | "tanh" | "relu";
+export type Op = "" | "+" | "*" | "pow" | "exp" | "log" | "tanh" | "relu" | "sigmoid";
 
 export type Scalar = Value | number;
 
@@ -105,6 +105,16 @@ export class Value {
     const out = new Value(Math.max(0, this.data), [this], "relu");
     out.backwardStep = () => {
       this.grad += (this.data > 0 ? 1 : 0) * out.grad;
+    };
+    return out;
+  }
+
+  /** σ(x) = 1 / (1 + e^-x): d/dx σ = σ(1 − σ). */
+  sigmoid(): Value {
+    const s = 1 / (1 + Math.exp(-this.data));
+    const out = new Value(s, [this], "sigmoid");
+    out.backwardStep = () => {
+      this.grad += s * (1 - s) * out.grad;
     };
     return out;
   }
