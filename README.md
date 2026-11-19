@@ -74,6 +74,22 @@ contribution from every path to the output.
 | `relu x` | 1 if x > 0 else 0 |
 | `σ(x)` | σ(x)(1 − σ(x)) |
 
+## Training a network
+
+A neuron computes `act(w · x + b)`; a layer is a list of neurons; an `MLP`
+stacks layers. Nothing new is needed for backprop: the network is just a big
+graph of `Value`s, so `loss.backward()` fills in `∂L/∂θ` for every weight.
+
+The loss is mean squared error and the update is plain gradient descent:
+
+```
+L = (1/n) Σ (ŷᵢ − yᵢ)²        ∂L/∂ŷᵢ = (2/n)(ŷᵢ − yᵢ)
+θ ← θ − η · ∂L/∂θ
+```
+
+Weights start uniform in `[−1, 1) / √nin` from a seeded PRNG, so every run is
+reproducible.
+
 ## Gradient checking
 
 Every op is tested against the central finite difference
