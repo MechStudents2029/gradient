@@ -72,6 +72,7 @@ contribution from every path to the output.
 | `ln x` | 1/x |
 | `tanh x` | 1 − tanh² x |
 | `relu x` | 1 if x > 0 else 0 |
+| `σ(x)` | σ(x)(1 − σ(x)) |
 
 ## Gradient checking
 
