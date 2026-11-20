@@ -133,11 +133,24 @@ export class Value {
     return order;
   }
 
-  /** Reverse-mode sweep: seed dL/dL = 1, then apply the chain rule backwards. */
-  backward(): void {
+  /**
+   * The reverse-mode sweep, one node at a time. Seeds dL/dL = 1, then visits
+   * nodes children-first, applying each node's local chain-rule step and
+   * yielding the node just processed. Lets a UI pause between steps.
+   */
+  *backwardSteps(): Generator<Value, void, undefined> {
     const order = this.topo();
     for (const v of order) v.grad = 0;
     this.grad = 1;
-    for (let i = order.length - 1; i >= 0; i--) order[i]!.backwardStep();
+    for (let i = order.length - 1; i >= 0; i--) {
+      const v = order[i]!;
+      v.backwardStep();
+      yield v;
+    }
+  }
+
+  /** Reverse-mode sweep: seed dL/dL = 1, then apply the chain rule backwards. */
+  backward(): void {
+    for (const _ of this.backwardSteps());
   }
 }
