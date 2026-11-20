@@ -1,5 +1,13 @@
 # Changelog
 
+## Day 3 — 2026-11-20
+
+- `toGraph`, `layoutGraph`, and `backwardTrace` turn a `Value` graph into plain data: topologically ordered nodes with depth, edges with argument slots, a layered layout, and per-step gradient snapshots.
+- `Value.backwardSteps()` runs the reverse sweep one node at a time; `backward()` is built on it.
+- `parseExpr` / `parseVars`: a small expression parser so graphs can be typed as text.
+- Web visualizer in `web/` (Vite + vanilla TS): SVG graph with values and gradients, stepping through the backward pass.
+- CI also builds the demo. 38 tests.
+
 ## Day 2 — 2026-11-19
 
 - `sigmoid` op with derivative σ(1 − σ).
