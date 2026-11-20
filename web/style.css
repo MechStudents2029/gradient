@@ -1,0 +1,51 @@
+:root {
+  --bg: #0f1115;
+  --panel: #171a21;
+  --text: #e6e8ee;
+  --muted: #8b93a7;
+  --leaf: #1f2a3a;
+  --op: #232030;
+  --border: #39404f;
+  --accent: #f5a524;
+  --grad: #4cc38a;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+body { margin: 0 auto; max-width: 1200px; padding: 1.5rem; }
+h1 { margin: 0; font-size: 1.6rem; }
+h1 span { color: var(--muted); font-weight: 400; }
+header p { color: var(--muted); margin: 0.4rem 0 1rem; }
+code { background: var(--panel); padding: 0 0.3em; border-radius: 4px; }
+a { color: var(--accent); }
+
+#controls, #toolbar { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: end; margin-bottom: 0.75rem; }
+label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.8rem; color: var(--muted); }
+label.grow { flex: 1 1 220px; }
+input, select, button {
+  font: inherit; font-size: 0.95rem; color: var(--text); background: var(--panel);
+  border: 1px solid var(--border); border-radius: 6px; padding: 0.45rem 0.6rem;
+}
+input { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+button { cursor: pointer; }
+button:hover:not(:disabled) { border-color: var(--accent); }
+button:disabled { opacity: 0.45; cursor: default; }
+#progress { color: var(--muted); font-size: 0.85rem; }
+
+#status { min-height: 2.6em; margin: 0 0 0.75rem; font-family: ui-monospace, Menlo, monospace; font-size: 0.9rem; }
+#status.error { color: #ff6b6b; }
+
+#canvas { overflow: auto; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; }
+svg { display: block; }
+.edge { fill: none; stroke: var(--border); stroke-width: 1.5; }
+.edge.hot { stroke: var(--accent); stroke-width: 3; }
+.node rect { fill: var(--op); stroke: var(--border); stroke-width: 1.5; }
+.node.leaf rect { fill: var(--leaf); }
+.node.done rect { stroke: var(--grad); }
+.node.active rect { stroke: var(--accent); stroke-width: 3; }
+.node text { fill: var(--text); font-family: ui-monospace, Menlo, monospace; font-size: 12px; }
+.node .title { font-weight: 700; font-size: 13px; }
+.node .grad { fill: var(--grad); }
+.node .grad.zero { fill: var(--muted); }
+
+footer { margin-top: 1rem; color: var(--muted); font-size: 0.85rem; }

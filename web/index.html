@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>gradient · computation graph</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22><text y=%2214%22 font-size=%2214%22>∇</text></svg>" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>gradient <span>computation graph</span></h1>
+      <p>
+        Type an expression, see its graph with forward values, then step through
+        the backward pass to watch gradients flow from the output to the inputs.
+      </p>
+    </header>
+
+    <form id="controls" autocomplete="off">
+      <label>
+        Preset
+        <select id="preset"></select>
+      </label>
+      <label class="grow">
+        Expression
+        <input id="expr" spellcheck="false" />
+      </label>
+      <label class="grow">
+        Variables
+        <input id="vars" spellcheck="false" />
+      </label>
+      <button type="submit">Build graph</button>
+    </form>
+
+    <div id="toolbar">
+      <button id="reset" type="button">Reset grads</button>
+      <button id="back" type="button">◀ Step</button>
+      <button id="step" type="button">Step backward ▶</button>
+      <button id="run" type="button">Run full backward</button>
+      <span id="progress"></span>
+    </div>
+
+    <p id="status" role="status"></p>
+
+    <div id="canvas"><svg id="graph" xmlns="http://www.w3.org/2000/svg"></svg></div>
+
+    <footer>
+      Functions: <code>tanh exp log relu sigmoid</code> · operators
+      <code>+ - * / ^</code> (constant exponents) ·
+      <a href="https://github.com/MechStudents2029/gradient">source</a>
+    </footer>
+
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>
