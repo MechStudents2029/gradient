@@ -8,7 +8,8 @@ The plan: a tiny scalar autodiff core, then a web UI that draws the computation
 graph, walks through derivatives step by step, shows Taylor-series
 approximations, and trains a small neural net live in the browser.
 
-Work in progress — see the roadmap below.
+Work in progress — see the roadmap below. The graph visualizer is already
+live at https://gradient-two-amber.vercel.app.
 
 ## Quick start
 
@@ -74,9 +75,9 @@ const steps = backwardTrace(out);    // gradients after each backward step
 
 - [x] Day 1: scalar `Value` with reverse-mode `backward()` and gradient checks
 - [x] Day 2: `sigmoid`, a tiny MLP, and SGD that learns XOR
-- [ ] Day 3: computation-graph visualizer (web UI)
+- [x] Day 3: computation-graph visualizer (web UI), with an early deploy on Vercel
 - [ ] Day 4: step-by-step derivative walkthrough + Taylor series
-- [ ] Day 5: live training demo, deployed on Vercel
+- [ ] Day 5: live training demo in the browser
 
 ## The math
 
