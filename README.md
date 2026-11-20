@@ -40,6 +40,34 @@ for (let step = 0; step < 2000; step++) {
 ```sh
 npm install
 npm test
+npm run dev   # graph visualizer
+```
+
+## Graph visualizer
+
+Live demo: **https://gradient-two-amber.vercel.app**
+
+The `web/` page draws any expression as a computation graph. Pick a preset
+(tanh neuron, sigmoid neuron, a reused variable, squared error, softplus) or
+type your own, e.g. `tanh(x1*w1 + x2*w2 + b)` with `x1 = 2, w1 = -3, ...`.
+Every node shows its forward value; press **Step backward** (or →) to apply
+one node's local chain-rule step at a time and watch gradients flow back to
+the inputs.
+
+```sh
+npm run dev      # local dev server
+npm run build    # static site in dist/
+```
+
+The same data is available from code:
+
+```ts
+import { parseExpr, toGraph, layoutGraph, backwardTrace } from "./src/index.js";
+
+const out = parseExpr("tanh(a*b + c)", { a: 2, b: -3, c: 6.5 });
+const graph = toGraph(out);          // nodes (topo order) + edges
+const layout = layoutGraph(graph);   // x/y for each node id
+const steps = backwardTrace(out);    // gradients after each backward step
 ```
 
 ## Roadmap
