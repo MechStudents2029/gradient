@@ -8,8 +8,8 @@ The plan: a tiny scalar autodiff core, then a web UI that draws the computation
 graph, walks through derivatives step by step, shows Taylor-series
 approximations, and trains a small neural net live in the browser.
 
-Work in progress — see the roadmap below. The graph visualizer is already
-live at https://gradient-two-amber.vercel.app.
+Work in progress — see the roadmap below. The graph visualizer and the
+Taylor-series view are live at https://gradient-two-amber.vercel.app.
 
 ## Quick start
 
@@ -115,7 +115,7 @@ taylorPolynomial(c, 0, 0.2);         // ≈ log(1.2)
 - [x] Day 1: scalar `Value` with reverse-mode `backward()` and gradient checks
 - [x] Day 2: `sigmoid`, a tiny MLP, and SGD that learns XOR
 - [x] Day 3: computation-graph visualizer (web UI), with an early deploy on Vercel
-- [ ] Day 4: step-by-step derivative walkthrough + Taylor series
+- [x] Day 4: Taylor series via Taylor-mode autodiff, with a plot of f and P₁..P_N (the step-by-step backward walkthrough shipped with Day 3)
 - [ ] Day 5: live training demo in the browser
 
 ## The math
