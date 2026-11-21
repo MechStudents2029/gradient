@@ -71,6 +71,45 @@ const layout = layoutGraph(graph);   // x/y for each node id
 const steps = backwardTrace(out);    // gradients after each backward step
 ```
 
+## Taylor series
+
+Live demo: **https://gradient-two-amber.vercel.app/taylor.html**
+
+`backward()` gives first derivatives. For f″, f‴, ... at a point, gradient
+pushes a whole truncated power series through the same graph instead
+(Taylor-mode autodiff). Substitute x = a + t; then every node is a polynomial
+in t up to degree n:
+
+```
+u(a + t) = u₀ + u₁t + u₂t² + ... + uₙtⁿ + O(tⁿ⁺¹)      uₖ = u⁽ᵏ⁾(a) / k!
+```
+
+The input is `[a, 1, 0, ...]`, constants are `[c, 0, 0, ...]`, and each op
+maps coefficient arrays to coefficient arrays exactly. Products are the Cauchy
+product `(uv)ₖ = Σⱼ uⱼvₖ₋ⱼ`; functions come from their ODE. For y = eᵘ,
+y′ = y·u′ gives
+
+```
+k·yₖ = Σⱼ₌₁..ₖ j·uⱼ·yₖ₋ⱼ
+```
+
+so the coefficients fill in one at a time. The result is the Taylor polynomial
+
+```
+Pₙ(x) = Σₖ₌₀..ₙ f⁽ᵏ⁾(a)/k! · (x − a)ᵏ
+```
+
+with no finite differences and no symbolic algebra.
+
+```ts
+import { taylorCoefficients, derivativesAt, taylorPolynomial } from "./src/index.js";
+
+taylorCoefficients("sin(x)", 0, 5);  // [0, 1, 0, -1/6, 0, 1/120]
+derivativesAt("exp(sin(x))", 0, 3);  // [1, 1, 1, 0]
+const c = taylorCoefficients("log(1 + x)", 0, 6);
+taylorPolynomial(c, 0, 0.2);         // ≈ log(1.2)
+```
+
 ## Roadmap
 
 - [x] Day 1: scalar `Value` with reverse-mode `backward()` and gradient checks
