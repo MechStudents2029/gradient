@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>gradient · Taylor series</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22><text y=%2214%22 font-size=%2214%22>∇</text></svg>" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <nav><a href="./index.html">Computation graph</a> · <strong>Taylor series</strong></nav>
+    <header>
+      <h1>gradient <span>Taylor series</span></h1>
+      <p>
+        Every derivative here comes from pushing a truncated power series through
+        the expression's computation graph (Taylor-mode autodiff) — no finite
+        differences, no symbolic algebra. Drag <em>a</em> to move the expansion point.
+      </p>
+    </header>
+
+    <form id="controls" autocomplete="off">
+      <label>
+        Preset
+        <select id="preset"></select>
+      </label>
+      <label class="grow">
+        f(x)
+        <input id="expr" spellcheck="false" />
+      </label>
+      <label>
+        x range
+        <input id="range" spellcheck="false" size="9" />
+      </label>
+      <button type="submit">Plot</button>
+    </form>
+
+    <div id="toolbar">
+      <label class="slider">
+        <span>a = <output id="a-out"></output></span>
+        <input id="a" type="range" step="0.01" />
+      </label>
+      <label class="slider">
+        <span>max order N = <output id="n-out"></output></span>
+        <input id="n" type="range" min="1" max="12" step="1" value="5" />
+      </label>
+    </div>
+
+    <p id="status" role="status"></p>
+
+    <div id="canvas"><svg id="plot" xmlns="http://www.w3.org/2000/svg"></svg></div>
+
+    <section id="formula">
+      <p class="math">
+        P<sub>N</sub>(x) = Σ<sub>k=0..N</sub> f<sup>(k)</sup>(a) / k! · (x − a)<sup>k</sup>
+      </p>
+      <p class="math" id="poly"></p>
+      <table id="coeffs">
+        <thead><tr><th>k</th><th>f<sup>(k)</sup>(a)</th><th>c<sub>k</sub> = f<sup>(k)</sup>(a) / k!</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <footer>
+      Functions: <code>sin cos exp log tanh sigmoid relu</code> · operators
+      <code>+ - * / ^</code> (constant exponents) ·
+      <a href="https://github.com/MechStudents2029/gradient">source</a>
+    </footer>
+
+    <script type="module" src="./taylor.ts"></script>
+  </body>
+</html>

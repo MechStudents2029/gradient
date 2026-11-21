@@ -7,3 +7,19 @@ export { toGraph, layoutGraph, backwardTrace } from "./graph.js";
 export type { Graph, GraphNode, GraphEdge, Layout, LayoutOptions, Point, TraceStep } from "./graph.js";
 export { parseExpr, parseVars, ParseError, FUNCTIONS } from "./expr.js";
 export type { FunctionName } from "./expr.js";
+export {
+  taylorCoefficients,
+  derivativesAt,
+  taylorPolynomial,
+  graphJet,
+  jetAdd,
+  jetMul,
+  jetExp,
+  jetLog,
+  jetPow,
+  jetSinCos,
+  jetTanh,
+  jetSigmoid,
+  jetRelu,
+} from "./taylor.js";
+export type { Jet, TaylorOptions } from "./taylor.js";

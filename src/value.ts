@@ -7,7 +7,7 @@
  *
  *     dL/dparent += dL/dchild * dchild/dparent
  */
-export type Op = "" | "+" | "*" | "pow" | "exp" | "log" | "tanh" | "relu" | "sigmoid";
+export type Op = "" | "+" | "*" | "pow" | "exp" | "log" | "tanh" | "relu" | "sigmoid" | "sin" | "cos";
 
 export type Scalar = Value | number;
 
@@ -17,6 +17,8 @@ export class Value {
   readonly parents: readonly Value[];
   readonly op: Op;
   label: string;
+  /** The constant exponent of a `pow` node (undefined for every other op). */
+  exponent?: number;
   private backwardStep: () => void = () => {};
 
   constructor(data: number, parents: readonly Value[] = [], op: Op = "", label = "") {
@@ -53,6 +55,7 @@ export class Value {
   /** x^k for a constant exponent k: d/dx = k * x^(k-1). */
   pow(k: number): Value {
     const out = new Value(this.data ** k, [this], "pow");
+    out.exponent = k;
     out.backwardStep = () => {
       this.grad += k * this.data ** (k - 1) * out.grad;
     };
@@ -115,6 +118,24 @@ export class Value {
     const out = new Value(s, [this], "sigmoid");
     out.backwardStep = () => {
       this.grad += s * (1 - s) * out.grad;
+    };
+    return out;
+  }
+
+  /** d/dx sin x = cos x. */
+  sin(): Value {
+    const out = new Value(Math.sin(this.data), [this], "sin");
+    out.backwardStep = () => {
+      this.grad += Math.cos(this.data) * out.grad;
+    };
+    return out;
+  }
+
+  /** d/dx cos x = −sin x. */
+  cos(): Value {
+    const out = new Value(Math.cos(this.data), [this], "cos");
+    out.backwardStep = () => {
+      this.grad += -Math.sin(this.data) * out.grad;
     };
     return out;
   }

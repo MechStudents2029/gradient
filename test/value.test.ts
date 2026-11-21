@@ -76,3 +76,10 @@ describe("topo", () => {
     expect(order.at(-1)).toBe(c);
   });
 });
+
+describe("sin and cos", () => {
+  it("match finite differences", () => {
+    check(([x]) => x!.sin().mul(x!.cos()), [0.9]);
+    check(([x, y]) => x!.mul(y!).sin().add(y!.cos()), [-0.4, 1.7]);
+  });
+});
