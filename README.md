@@ -141,6 +141,8 @@ contribution from every path to the output.
 | `tanh x` | 1 − tanh² x |
 | `relu x` | 1 if x > 0 else 0 |
 | `σ(x)` | σ(x)(1 − σ(x)) |
+| `sin x` | cos x |
+| `cos x` | −sin x |
 
 ## Training a network
 
