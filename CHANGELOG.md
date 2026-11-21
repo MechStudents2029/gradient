@@ -1,5 +1,13 @@
 # Changelog
 
+## Day 4 — 2026-11-21
+
+- Taylor-mode autodiff in `src/taylor.ts`: push truncated power series (jets) through the `Value` graph to get exact f⁽ᵏ⁾(a) for any order in one forward sweep.
+- `taylorCoefficients`, `derivativesAt`, `taylorPolynomial`, `graphJet`, and per-op jet recurrences (`+`, `*`, `pow`, `exp`, `log`, `sin`, `cos`, `tanh`, `sigmoid`, `relu`).
+- New `sin` and `cos` ops on `Value` and in the expression parser.
+- Web view `taylor.html`: f(x) against P₁..P_N around a draggable expansion point, with the coefficient formula and a derivative table.
+- Tests against known series, the reverse-mode gradient, and the Lagrange remainder. 57 tests.
+
 ## Day 3 — 2026-11-20
 
 - `toGraph`, `layoutGraph`, and `backwardTrace` turn a `Value` graph into plain data: topologically ordered nodes with depth, edges with argument slots, a layered layout, and per-step gradient snapshots.
