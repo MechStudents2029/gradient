@@ -1,7 +1,7 @@
 import { Value } from "./value.js";
 
 /** Unary functions an expression may call, mapped to the matching `Value` op. */
-export const FUNCTIONS = ["tanh", "exp", "log", "relu", "sigmoid"] as const;
+export const FUNCTIONS = ["tanh", "exp", "log", "relu", "sigmoid", "sin", "cos"] as const;
 export type FunctionName = (typeof FUNCTIONS)[number];
 
 export class ParseError extends Error {

@@ -81,6 +81,10 @@ function localRule(n: GraphNode, parents: GraphNode[]): string {
       return `∂out/∂x = ${a!.data > 0 ? 1 : 0} (x ${a!.data > 0 ? ">" : "≤"} 0)`;
     case "sigmoid":
       return `∂out/∂x = σ(1 − σ) = ${fmt(n.data * (1 - n.data))}`;
+    case "sin":
+      return `∂out/∂x = cos x = ${fmt(Math.cos(a!.data))}`;
+    case "cos":
+      return `∂out/∂x = −sin x = ${fmt(-Math.sin(a!.data))}`;
     default:
       return "";
   }

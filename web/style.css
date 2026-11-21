@@ -49,3 +49,23 @@ svg { display: block; }
 .node .grad.zero { fill: var(--muted); }
 
 footer { margin-top: 1rem; color: var(--muted); font-size: 0.85rem; }
+
+nav { font-size: 0.85rem; color: var(--muted); margin-bottom: 0.75rem; }
+nav strong { color: var(--text); }
+label.slider { flex: 1 1 260px; }
+label.slider input { padding: 0; accent-color: var(--accent); }
+output { color: var(--text); font-family: ui-monospace, Menlo, monospace; }
+#plot { width: 100%; height: auto; }
+.axis { stroke: var(--border); stroke-width: 1; }
+.at { stroke: var(--accent); stroke-dasharray: 4 4; stroke-width: 1; }
+.point { fill: var(--accent); }
+.f { fill: none; stroke: var(--text); stroke-width: 2.4; }
+.taylor { fill: none; }
+.tick { fill: var(--muted); font-size: 11px; font-family: ui-monospace, Menlo, monospace; }
+.legend { font-size: 12px; font-family: ui-monospace, Menlo, monospace; }
+#formula { margin-top: 1rem; }
+.math { font-family: ui-monospace, Menlo, monospace; font-size: 0.95rem; overflow-x: auto; }
+#coeffs { border-collapse: collapse; font-family: ui-monospace, Menlo, monospace; font-size: 0.85rem; }
+#coeffs th, #coeffs td { border-bottom: 1px solid var(--border); padding: 0.25rem 0.9rem; text-align: right; }
+#coeffs th { color: var(--muted); font-weight: 400; }
+.legend-bg { fill: var(--panel); opacity: 0.85; }
