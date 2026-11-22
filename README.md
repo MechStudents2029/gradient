@@ -8,8 +8,8 @@ The plan: a tiny scalar autodiff core, then a web UI that draws the computation
 graph, walks through derivatives step by step, shows Taylor-series
 approximations, and trains a small neural net live in the browser.
 
-Work in progress — see the roadmap below. The graph visualizer and the
-Taylor-series view are live at https://gradient-two-amber.vercel.app.
+The graph visualizer, the Taylor-series view, and the live training page are
+up at https://gradient-two-amber.vercel.app.
 
 ## Quick start
 
@@ -108,6 +108,37 @@ taylorCoefficients("sin(x)", 0, 5);  // [0, 1, 0, -1/6, 0, 1/120]
 derivativesAt("exp(sin(x))", 0, 3);  // [1, 1, 1, 0]
 const c = taylorCoefficients("log(1 + x)", 0, 6);
 taylorPolynomial(c, 0, 0.2);         // ≈ log(1.2)
+```
+
+## Live training
+
+Live demo: **https://gradient-two-amber.vercel.app/train.html**
+
+Pick a 2D toy dataset (XOR, two moons, or concentric circles) and a seed, then
+press **Start**. A 2 → h → h → 1 network (tanh hidden layers, sigmoid output)
+trains with full-batch gradient descent on MSE, and two plots redraw every
+frame:
+
+- **Decision boundary**: the net's output over [−1.5, 1.5]², blue ≈ 0 and
+  orange ≈ 1, with the 0.5 contour drawn in white and the training points on top.
+- **Loss curve**: MSE per epoch on a log scale.
+
+The learning-rate slider (η from 0.01 to about 4, log scale) applies live, so you
+can push η too high mid-run and watch the loss blow up. Changing the dataset,
+seed, or hidden size rebuilds the network from the same seed, so every run is
+reproducible. **Step** runs exactly one epoch.
+
+The same pieces are plain library code:
+
+```ts
+import { Trainer, makeDataset, decisionGrid } from "./src/index.js";
+
+const data = makeDataset("moons", { n: 120, seed: 1 });
+const t = new Trainer(data, { hidden: 8, lr: 1.0, seed: 1 });
+t.step(400);                      // 400 full-batch epochs
+t.losses.at(-1);                  // final MSE
+t.accuracy();                     // fraction classified correctly at 0.5
+decisionGrid(t.net, { res: 50 }); // 50×50 outputs for a heatmap
 ```
 
 ## Roadmap
