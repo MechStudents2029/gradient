@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>gradient · Train a network</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22><text y=%2214%22 font-size=%2214%22>∇</text></svg>" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <nav><a href="./index.html">Computation graph</a> · <a href="./taylor.html">Taylor series</a> · <strong>Train a network</strong></nav>
+    <header>
+      <h1>gradient <span>live training</span></h1>
+      <p>
+        A 2 → h → h → 1 tanh/sigmoid MLP built from scalar <code>Value</code>s, trained
+        with full-batch gradient descent on mean squared error. Every gradient comes
+        from <code>loss.backward()</code> on the engine — the heatmap is the net's
+        output over the plane, redrawn as it learns.
+      </p>
+    </header>
+
+    <form id="controls" autocomplete="off">
+      <label>
+        Dataset
+        <select id="dataset">
+          <option value="xor">XOR</option>
+          <option value="moons">Two moons</option>
+          <option value="circles">Circles</option>
+        </select>
+      </label>
+      <label>
+        Seed
+        <input id="seed" type="number" value="1" min="0" step="1" size="5" />
+      </label>
+      <button type="button" id="start">Start</button>
+      <button type="button" id="step">Step</button>
+      <button type="button" id="reset">Reset</button>
+    </form>
+
+    <div id="toolbar">
+      <label class="slider">
+        <span>learning rate η = <output id="lr-out"></output></span>
+        <input id="lr" type="range" min="-2" max="0.6" step="0.05" value="0" />
+      </label>
+      <label class="slider">
+        <span>hidden size h = <output id="hidden-out"></output></span>
+        <input id="hidden" type="range" min="2" max="16" step="1" value="8" />
+      </label>
+      <label class="slider">
+        <span>epochs per frame = <output id="speed-out"></output></span>
+        <input id="speed" type="range" min="1" max="10" step="1" value="2" />
+      </label>
+    </div>
+
+    <p id="status" role="status"></p>
+
+    <div id="train-panels">
+      <figure>
+        <canvas id="boundary" width="440" height="440"></canvas>
+        <figcaption>Decision boundary: orange ≈ 1, blue ≈ 0, white line at 0.5</figcaption>
+      </figure>
+      <figure>
+        <canvas id="loss" width="560" height="440"></canvas>
+        <figcaption>Training loss (MSE, log scale) per epoch</figcaption>
+      </figure>
+    </div>
+
+    <footer>
+      Changing the dataset, seed, or hidden size rebuilds the net; the learning rate
+      applies live · <a href="https://github.com/MechStudents2029/gradient">source</a>
+    </footer>
+
+    <script type="module" src="./train.ts"></script>
+  </body>
+</html>

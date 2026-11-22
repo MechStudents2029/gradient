@@ -12,6 +12,7 @@ export default defineConfig({
       input: {
         graph: resolve(import.meta.dirname, "web/index.html"),
         taylor: resolve(import.meta.dirname, "web/taylor.html"),
+        train: resolve(import.meta.dirname, "web/train.html"),
       },
     },
   },

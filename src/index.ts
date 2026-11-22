@@ -23,3 +23,7 @@ export {
   jetRelu,
 } from "./taylor.js";
 export type { Jet, TaylorOptions } from "./taylor.js";
+export { gaussian, xorDataset, moonsDataset, circlesDataset, makeDataset, DATASETS } from "./data.js";
+export type { Dataset, DatasetName, DatasetOptions } from "./data.js";
+export { predict, accuracy, trainEpoch, decisionGrid, Trainer } from "./train.js";
+export type { GridOptions, TrainerOptions } from "./train.js";
