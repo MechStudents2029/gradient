@@ -147,7 +147,7 @@ decisionGrid(t.net, { res: 50 }); // 50×50 outputs for a heatmap
 - [x] Day 2: `sigmoid`, a tiny MLP, and SGD that learns XOR
 - [x] Day 3: computation-graph visualizer (web UI), with an early deploy on Vercel
 - [x] Day 4: Taylor series via Taylor-mode autodiff, with a plot of f and P₁..P_N (the step-by-step backward walkthrough shipped with Day 3)
-- [ ] Day 5: live training demo in the browser
+- [x] Day 5: live training demo in the browser (XOR, two moons, circles) with a decision-boundary heatmap and loss curve
 
 ## The math
 
