@@ -1,5 +1,13 @@
 # Changelog
 
+## Day 5 — 2026-11-22
+
+- Seeded 2D toy datasets in `src/data.ts`: `xorDataset`, `moonsDataset`, `circlesDataset`, `makeDataset`, and a Box–Muller `gaussian`.
+- Training helpers in `src/train.ts`: `trainEpoch` (full-batch gradient descent on MSE), `predict` (a graph-free forward pass on plain numbers), `accuracy`, `decisionGrid`, and a `Trainer` that keeps the loss history.
+- Web page `train.html`: train an MLP live with a decision-boundary heatmap and a log-scale loss curve; controls for dataset, seed, learning rate, hidden size, and speed, plus start/pause/step/reset.
+- Nav links between all three demo pages.
+- Tests for dataset shape, determinism, and geometry; `predict` against the `Value` forward pass; `trainEpoch` against a hand-rolled SGD step; and the trainer separating all three datasets. 75 tests.
+
 ## Day 4 — 2026-11-21
 
 - Taylor-mode autodiff in `src/taylor.ts`: push truncated power series (jets) through the `Value` graph to get exact f⁽ᵏ⁾(a) for any order in one forward sweep.
