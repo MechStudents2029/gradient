@@ -69,3 +69,11 @@ output { color: var(--text); font-family: ui-monospace, Menlo, monospace; }
 #coeffs th, #coeffs td { border-bottom: 1px solid var(--border); padding: 0.25rem 0.9rem; text-align: right; }
 #coeffs th { color: var(--muted); font-weight: 400; }
 .legend-bg { fill: var(--panel); opacity: 0.85; }
+#train-panels { display: flex; flex-wrap: wrap; gap: 1rem; }
+#train-panels figure { margin: 0; flex: 1 1 360px; }
+#train-panels canvas {
+  display: block; width: 100%; height: auto; background: var(--panel);
+  border: 1px solid var(--border); border-radius: 10px;
+}
+#train-panels figcaption { color: var(--muted); font-size: 0.8rem; margin-top: 0.35rem; }
+#boundary { max-width: 440px; }
