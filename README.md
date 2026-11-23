@@ -1,17 +1,54 @@
 # gradient
 
 [![CI](https://github.com/MechStudents2029/gradient/actions/workflows/ci.yml/badge.svg)](https://github.com/MechStudents2029/gradient/actions/workflows/ci.yml)
+[![Live demo](https://img.shields.io/badge/demo-gradient--two--amber.vercel.app-orange)](https://gradient-two-amber.vercel.app)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-A from-scratch reverse-mode automatic differentiation engine in TypeScript.
+A from-scratch reverse-mode automatic differentiation engine in TypeScript,
+with three browser demos built on it: a computation-graph debugger that steps
+through backprop one node at a time, Taylor series computed by Taylor-mode
+autodiff, and a small neural network trained live on 2D toy data.
 
-The plan: a tiny scalar autodiff core, then a web UI that draws the computation
-graph, walks through derivatives step by step, shows Taylor-series
-approximations, and trains a small neural net live in the browser.
+No dependencies at runtime: every number on screen comes from a scalar
+`Value` graph and its `backward()` pass.
 
-The graph visualizer, the Taylor-series view, and the live training page are
-up at https://gradient-two-amber.vercel.app.
+![Computation graph view: squared error (y − (w·x + b))², three steps into the backward pass](docs/screenshots/graph-view.png)
+
+## Live demos
+
+| page | what it shows |
+| --- | --- |
+| [Computation graph](https://gradient-two-amber.vercel.app) | Type any expression, see its graph with forward values, step the backward pass and watch gradients flow to the inputs. |
+| [Taylor series](https://gradient-two-amber.vercel.app/taylor.html) | f(x) against its Taylor polynomials P₁..P_N around a draggable point a, every coefficient from Taylor-mode autodiff. |
+| [Train a network](https://gradient-two-amber.vercel.app/train.html) | A tanh/sigmoid MLP learning XOR, two moons, or circles with a live decision boundary and loss curve. |
+
+## Features
+
+- **Scalar autodiff core**: `Value` with `+ − × ÷`, constant powers, `exp`,
+  `log`, `tanh`, `relu`, `sigmoid`, `sin`, `cos`, and reverse-mode `backward()`.
+- **Gradient checks**: every op is tested against central finite differences.
+- **Neural nets**: `Neuron`, `Layer`, `MLP`, MSE loss, and SGD, all seeded so
+  runs are reproducible.
+- **Expression parser**: `parseExpr("tanh(a*b + c)", { a: 2, ... })` builds a graph from text.
+- **Graph export and layout**: `toGraph`, a layered `layoutGraph`, and
+  `routeEdges`, which steers edges that skip a column around the nodes in
+  between instead of drawing over them.
+- **Step-by-step backward**: `backwardTrace` snapshots every gradient after
+  each local chain-rule step.
+- **Taylor-mode autodiff**: exact f⁽ᵏ⁾(a) for any order in one forward sweep.
+- **Training helpers**: seeded toy datasets, `Trainer`, accuracy, and a
+  decision-boundary grid.
 
 ## Quick start
+
+```sh
+git clone https://github.com/MechStudents2029/gradient.git
+cd gradient
+npm install
+npm test          # Vitest suite
+npm run dev       # demos at http://localhost:5173
+npm run build     # static site in dist/
+```
 
 ```ts
 import { Value } from "./src/index.js";
@@ -38,42 +75,86 @@ for (let step = 0; step < 2000; step++) {
 }
 ```
 
-```sh
-npm install
-npm test
-npm run dev   # graph visualizer
+## How reverse-mode autodiff works
+
+Every arithmetic operation creates a `Value` that remembers its inputs
+(parents) and how to differentiate itself locally. A whole program therefore
+becomes a directed acyclic graph that ends at one output L.
+
+**Chain rule.** If L depends on a parent p only through a child c = f(p, ...),
+then
+
 ```
+∂L/∂p = ∂L/∂c · ∂c/∂p
+```
+
+∂c/∂p is the op's local derivative (the table below), known as soon as the
+forward pass has run. When p feeds several children (like `x` in `x·x + x`),
+each path contributes, so gradients are **accumulated**:
+
+```
+∂L/∂p = Σ over children c of p:  ∂L/∂c · ∂c/∂p
+```
+
+**Topological order.** That sum needs ∂L/∂c to be final for every child
+before it is pushed into p. `backward()` gets this from a topological sort: a
+depth-first search lists every node after all of its parents, so walking the
+list in reverse visits every child before any of its parents. It seeds
+∂L/∂L = 1 and then each node runs its local rule once:
+
+```
+for c in reversed(topo(L)):
+    for p in parents(c):
+        p.grad += c.grad · ∂c/∂p
+```
+
+**Why reverse.** One backward sweep costs about as much as the forward pass
+and yields ∂L/∂θ for *every* input θ at once. Forward mode would need one
+sweep per input, which is why reverse mode (backprop) is what trains networks.
+
+| op | local derivative |
+| --- | --- |
+| `a + b` | 1, 1 |
+| `a · b` | b, a |
+| `xᵏ` | k·xᵏ⁻¹ |
+| `eˣ` | eˣ |
+| `ln x` | 1/x |
+| `tanh x` | 1 − tanh² x |
+| `relu x` | 1 if x > 0 else 0 |
+| `σ(x)` | σ(x)(1 − σ(x)) |
+| `sin x` | cos x |
+| `cos x` | −sin x |
 
 ## Graph visualizer
 
 Live demo: **https://gradient-two-amber.vercel.app**
 
-The `web/` page draws any expression as a computation graph. Pick a preset
+The graph page draws any expression as a computation graph. Pick a preset
 (tanh neuron, sigmoid neuron, a reused variable, squared error, softplus) or
 type your own, e.g. `tanh(x1*w1 + x2*w2 + b)` with `x1 = 2, w1 = -3, ...`.
 Every node shows its forward value; press **Step backward** (or →) to apply
 one node's local chain-rule step at a time and watch gradients flow back to
-the inputs.
-
-```sh
-npm run dev      # local dev server
-npm run build    # static site in dist/
-```
+the inputs. Nodes sit in columns by depth; an edge that skips a column is
+routed through the gap between that column's nodes, so it never hides a box.
 
 The same data is available from code:
 
 ```ts
-import { parseExpr, toGraph, layoutGraph, backwardTrace } from "./src/index.js";
+import { parseExpr, toGraph, layoutGraph, routeEdges, routePath, backwardTrace } from "./src/index.js";
 
 const out = parseExpr("tanh(a*b + c)", { a: 2, b: -3, c: 6.5 });
 const graph = toGraph(out);          // nodes (topo order) + edges
 const layout = layoutGraph(graph);   // x/y for each node id
+const routes = routeEdges(graph, layout, { nodeWidth: 132, nodeHeight: 58 });
+routePath(routes[0]!.points);        // SVG path data for one edge
 const steps = backwardTrace(out);    // gradients after each backward step
 ```
 
 ## Taylor series
 
 Live demo: **https://gradient-two-amber.vercel.app/taylor.html**
+
+![Taylor series view: sin x against its Taylor polynomials P1 to P5 around a = 0](docs/screenshots/taylor-view.png)
 
 `backward()` gives first derivatives. For f″, f‴, ... at a point, gradient
 pushes a whole truncated power series through the same graph instead
@@ -114,6 +195,8 @@ taylorPolynomial(c, 0, 0.2);         // ≈ log(1.2)
 
 Live demo: **https://gradient-two-amber.vercel.app/train.html**
 
+![Live training page: XOR decision boundary after about 800 epochs and the loss curve](docs/screenshots/train-view.png)
+
 Pick a 2D toy dataset (XOR, two moons, or concentric circles) and a seed, then
 press **Start**. A 2 → h → h → 1 network (tanh hidden layers, sigmoid output)
 trains with full-batch gradient descent on MSE, and two plots redraw every
@@ -141,40 +224,6 @@ t.accuracy();                     // fraction classified correctly at 0.5
 decisionGrid(t.net, { res: 50 }); // 50×50 outputs for a heatmap
 ```
 
-## Roadmap
-
-- [x] Day 1: scalar `Value` with reverse-mode `backward()` and gradient checks
-- [x] Day 2: `sigmoid`, a tiny MLP, and SGD that learns XOR
-- [x] Day 3: computation-graph visualizer (web UI), with an early deploy on Vercel
-- [x] Day 4: Taylor series via Taylor-mode autodiff, with a plot of f and P₁..P_N (the step-by-step backward walkthrough shipped with Day 3)
-- [x] Day 5: live training demo in the browser (XOR, two moons, circles) with a decision-boundary heatmap and loss curve
-
-## The math
-
-Each `Value` stores its number, its parents, and a local derivative rule.
-`backward()` sorts the graph topologically, seeds `dL/dL = 1`, and walks it in
-reverse, applying the chain rule at every edge:
-
-```
-dL/dparent += dL/dchild · dchild/dparent
-```
-
-Gradients use `+=` because a node used twice (like `x` in `x·x + x`) receives a
-contribution from every path to the output.
-
-| op | local derivative |
-| --- | --- |
-| `a + b` | 1, 1 |
-| `a · b` | b, a |
-| `xᵏ` | k·xᵏ⁻¹ |
-| `eˣ` | eˣ |
-| `ln x` | 1/x |
-| `tanh x` | 1 − tanh² x |
-| `relu x` | 1 if x > 0 else 0 |
-| `σ(x)` | σ(x)(1 − σ(x)) |
-| `sin x` | cos x |
-| `cos x` | −sin x |
-
 ## Training a network
 
 A neuron computes `act(w · x + b)`; a layer is a list of neurons; an `MLP`
@@ -201,3 +250,37 @@ f'(x) ≈ (f(x + h) − f(x − h)) / 2h      (error O(h²))
 
 via `numericGrad` in `src/gradcheck.ts`, including a deep mixed expression of
 `tanh`, `exp`, powers, and division.
+
+## Project structure
+
+```
+src/
+  value.ts      Value: ops, local derivatives, topo sort, backward()
+  gradcheck.ts  central finite-difference gradient for tests
+  nn.ts         Neuron, Layer, MLP, mse, sgdStep, seeded PRNG
+  expr.ts       expression parser (text -> Value graph)
+  graph.ts      toGraph, layoutGraph, routeEdges, backwardTrace
+  taylor.ts     Taylor-mode autodiff (jets) and Taylor polynomials
+  data.ts       seeded 2D toy datasets
+  train.ts      Trainer, predict, accuracy, decisionGrid
+  index.ts      public API
+web/            Vite demo pages (graph, Taylor, training) importing src/ directly
+test/           Vitest suites, one per module
+docs/           write-ups of the math and design, plus screenshots
+.github/        CI: typecheck, tests, and a demo build on every push and PR
+```
+
+CI runs `npm run typecheck`, `npm test`, and `npm run build` on Node 22. The
+demo is a static Vite build of `web/` deployed to Vercel.
+
+## Roadmap
+
+- [x] Day 1: scalar `Value` with reverse-mode `backward()` and gradient checks
+- [x] Day 2: `sigmoid`, a tiny MLP, and SGD that learns XOR
+- [x] Day 3: computation-graph visualizer (web UI), with an early deploy on Vercel
+- [x] Day 4: Taylor series via Taylor-mode autodiff, with a plot of f and P₁..P_N (the step-by-step backward walkthrough shipped with Day 3)
+- [x] Day 5: live training demo in the browser (XOR, two moons, circles) with a decision-boundary heatmap and loss curve
+
+## License
+
+MIT, see [LICENSE](LICENSE).
