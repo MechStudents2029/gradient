@@ -1,5 +1,13 @@
 # Changelog
 
+## Day 6 — 2026-11-23
+
+- Edge routing in the graph view: `routeEdges` sends any edge that skips a layout column through the nearest free gap in that column instead of drawing it over the nodes in between, and `routePath` draws the routes as flat runs plus S-curves. Binary ops get separate input ports.
+- README rewrite: intro, links to all three live demos, feature list, quick start, the math of reverse-mode autodiff (chain rule, accumulation, topological order), project structure, and screenshots of every page.
+- `docs/graph-layout.md` covers edge routing; `docs/screenshots.md` explains how the screenshots are taken from a local build.
+- The Vercel project is now connected to this repo: `vercel.json` builds the Vite demo, pushes to `main` deploy to production, and pull requests get preview deploys.
+- Tests for straight neighbour edges, the `x*x + x` skip edge, no edge crossing a box in a deeper graph, input ports, and path output. 80 tests.
+
 ## Day 5 — 2026-11-22
 
 - Seeded 2D toy datasets in `src/data.ts`: `xorDataset`, `moonsDataset`, `circlesDataset`, `makeDataset`, and a Box–Muller `gaussian`.
