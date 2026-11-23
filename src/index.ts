@@ -3,8 +3,18 @@ export type { Op, Scalar } from "./value.js";
 export { numericGrad } from "./gradcheck.js";
 export { MLP, Layer, Neuron, mse, sgdStep, mulberry32 } from "./nn.js";
 export type { Activation } from "./nn.js";
-export { toGraph, layoutGraph, backwardTrace } from "./graph.js";
-export type { Graph, GraphNode, GraphEdge, Layout, LayoutOptions, Point, TraceStep } from "./graph.js";
+export { toGraph, layoutGraph, routeEdges, routePath, backwardTrace } from "./graph.js";
+export type {
+  Graph,
+  GraphNode,
+  GraphEdge,
+  Layout,
+  LayoutOptions,
+  Point,
+  EdgeRoute,
+  RouteOptions,
+  TraceStep,
+} from "./graph.js";
 export { parseExpr, parseVars, ParseError, FUNCTIONS } from "./expr.js";
 export type { FunctionName } from "./expr.js";
 export {

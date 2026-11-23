@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { Value, backwardTrace, layoutGraph, toGraph } from "../src/index.js";
+import { Value, backwardTrace, layoutGraph, parseExpr, routeEdges, routePath, toGraph } from "../src/index.js";
+import type { EdgeRoute, Graph, Layout } from "../src/index.js";
 
 function neuron() {
   const a = new Value(2, [], "", "a");
@@ -122,5 +123,75 @@ describe("backwardTrace", () => {
     expect(x.grad).toBeCloseTo(2 * 1.5 + 1);
     const steps = backwardTrace(y);
     expect(steps.at(-1)!.grads[toGraph(y).nodes.find((n) => n.label === "x")!.id]).toBeCloseTo(4);
+  });
+});
+
+describe("routeEdges", () => {
+  const W = 132;
+  const H = 58;
+  const opts = { nodeWidth: W, nodeHeight: H, portSpread: 18 };
+  const setup = (expr: string, vars: Record<string, number>) => {
+    const g = toGraph(parseExpr(expr, vars));
+    const layout = layoutGraph(g, { colGap: W + 70, rowGap: H + 30, margin: W / 2 + 16 });
+    return { g, layout, routes: routeEdges(g, layout, opts) };
+  };
+
+  /** Every segment that overlaps a box horizontally must pass above or below it. */
+  function expectNoOverlap(g: Graph, layout: Layout, routes: EdgeRoute[]) {
+    for (const { edge, points } of routes) {
+      for (const n of g.nodes) {
+        if (n.id === edge.from || n.id === edge.to) continue;
+        const { x, y } = layout.positions[n.id]!;
+        for (let i = 1; i < points.length; i++) {
+          const a = points[i - 1]!;
+          const b = points[i]!;
+          if (Math.max(a.x, b.x) <= x - W / 2 || Math.min(a.x, b.x) >= x + W / 2) continue;
+          expect(a.y).toBe(b.y); // only flat runs cross a column
+          expect(Math.abs(a.y - y)).toBeGreaterThan(H / 2);
+        }
+      }
+    }
+  }
+
+  it("draws neighbouring-column edges straight from port to port", () => {
+    const { g, layout, routes } = setup("tanh(a*b + c)", { a: 2, b: -3, c: 6.5 });
+    const mul = g.nodes.find((n) => n.op === "*")!;
+    const add = g.nodes.find((n) => n.op === "+")!;
+    const r = routes.find((r) => r.edge.from === mul.id && r.edge.to === add.id)!;
+    expect(r.points).toEqual([
+      { x: layout.positions[mul.id]!.x + W / 2, y: layout.positions[mul.id]!.y },
+      { x: layout.positions[add.id]!.x - W / 2, y: layout.positions[add.id]!.y - 9 },
+    ]);
+  });
+
+  it("routes a skip-column edge around the node it would have crossed", () => {
+    // x feeds both x*x (column 1) and the final + (column 2); all three sit on
+    // one row, so the straight x -> + edge would run right through x*x.
+    const { g, layout, routes } = setup("x*x + x", { x: 3 });
+    const x = g.nodes.find((n) => n.label === "x")!;
+    const add = g.nodes.find((n) => n.op === "+")!;
+    const mul = g.nodes.find((n) => n.op === "*")!;
+    expect(layout.positions[x.id]!.y).toBe(layout.positions[mul.id]!.y);
+    const skip = routes.find((r) => r.edge.from === x.id && r.edge.to === add.id)!;
+    expect(skip.points).toHaveLength(4);
+    expectNoOverlap(g, layout, routes);
+  });
+
+  it("keeps every edge off every box in a deeper graph", () => {
+    const { g, layout, routes } = setup("(y - (w*x + b))^2 + w*w + log(1 + exp(x))", { w: 0.5, x: 2, b: 0.1, y: 3 });
+    expect(routes).toHaveLength(g.edges.length);
+    expect(routes.some((r) => r.points.length > 2)).toBe(true);
+    expectNoOverlap(g, layout, routes);
+  });
+
+  it("turns points into SVG path data with flat runs and S-curves", () => {
+    expect(routePath([])).toBe("");
+    expect(
+      routePath([
+        { x: 0, y: 0 },
+        { x: 10, y: 20 },
+        { x: 30, y: 20 },
+      ]),
+    ).toBe("M 0 0 C 5 0, 5 20, 10 20 L 30 20");
   });
 });

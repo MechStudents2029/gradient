@@ -2,6 +2,8 @@ import {
   backwardTrace,
   layoutGraph,
   parseExpr,
+  routeEdges,
+  routePath,
   parseVars,
   toGraph,
   type Graph,
@@ -109,20 +111,9 @@ function render(): void {
   const done = new Set(trace.slice(1, cursor + 1).map((s) => s.active!));
   const byId = new Map(g.nodes.map((n) => [n.id, n]));
 
-  for (const e of g.edges) {
-    const p = layout.positions[e.from]!;
-    const c = layout.positions[e.to]!;
-    const x1 = p.x + NODE_W / 2;
-    const x2 = c.x - NODE_W / 2;
-    // Two inputs into one node land at slightly different heights.
-    const y2 = c.y + (byId.get(e.to)!.op === "" ? 0 : (e.slot - 0.5) * 18);
-    const mx = (x1 + x2) / 2;
-    svg.append(
-      el("path", {
-        d: `M ${x1} ${p.y} C ${mx} ${p.y}, ${mx} ${y2}, ${x2} ${y2}`,
-        class: e.to === active ? "edge hot" : "edge",
-      }),
-    );
+  // Edges that skip a column are routed through a gap so they never cross a node.
+  for (const { edge, points } of routeEdges(g, layout, { nodeWidth: NODE_W, nodeHeight: NODE_H, portSpread: 18 })) {
+    svg.append(el("path", { d: routePath(points), class: edge.to === active ? "edge hot" : "edge" }));
   }
 
   for (const n of g.nodes) {
