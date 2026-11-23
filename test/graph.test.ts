@@ -184,6 +184,17 @@ describe("routeEdges", () => {
     expectNoOverlap(g, layout, routes);
   });
 
+  it("lands the two inputs of a binary op on separate ports", () => {
+    const { g, layout, routes } = setup("a*b", { a: 2, b: 3 });
+    const mul = g.nodes.find((n) => n.op === "*")!;
+    const y = layout.positions[mul.id]!.y;
+    const ends = routes.map((r) => [r.edge.slot, r.points.at(-1)!.y]);
+    expect(Object.fromEntries(ends)).toEqual({ 0: y - 9, 1: y + 9 });
+    // Without a spread both edges meet the box at its centre.
+    const flat = routeEdges(g, layout, { nodeWidth: W, nodeHeight: H });
+    for (const r of flat) expect(r.points.at(-1)!.y).toBe(y);
+  });
+
   it("turns points into SVG path data with flat runs and S-curves", () => {
     expect(routePath([])).toBe("");
     expect(
