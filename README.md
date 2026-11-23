@@ -280,6 +280,7 @@ demo is a static Vite build of `web/` deployed to Vercel.
 - [x] Day 3: computation-graph visualizer (web UI), with an early deploy on Vercel
 - [x] Day 4: Taylor series via Taylor-mode autodiff, with a plot of f and P₁..P_N (the step-by-step backward walkthrough shipped with Day 3)
 - [x] Day 5: live training demo in the browser (XOR, two moons, circles) with a decision-boundary heatmap and loss curve
+- [x] Day 6: edges that skip a column route around nodes, README with the math and screenshots, Vercel auto-deploys from `main`
 
 ## License
 
